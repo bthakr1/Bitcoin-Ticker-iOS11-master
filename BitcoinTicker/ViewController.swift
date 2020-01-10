@@ -25,7 +25,9 @@ class ViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDele
         
         
         finalURL = baseURL + currencyArray[row]
-        print(finalURL)
+        
+        getBitcoinData(url: finalURL)
+       
     }
 
     
@@ -68,7 +70,23 @@ class ViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDele
 //    //MARK: - Networking
 //    /***************************************************************/
 
-    
+    func getBitcoinData(url: String){
+        
+        Alamofire.request(url, method: .get)
+            .responseJSON { response in
+                if response.result.isSuccess {
+                    
+                    print("Success ! Got the Bitcoin data!")
+                    
+                    let bitcoinJSON : JSON = JSON(response.result.value!)
+                    
+                    self.updateBitcoinData(json: bitcoinJSON)
+                } else {
+                    print("Error : \(String(describing: response.result.error))")
+                    self.bitcoinPriceLabel.text = "Connection Issues"
+                }
+        }
+    }
  
     
     
@@ -100,7 +118,17 @@ class ViewController: UIViewController, UIPickerViewDataSource, UIPickerViewDele
 //    //MARK: - JSON Parsing
 //    /***************************************************************/
 
-    
+    func updateBitcoinData(json : JSON) {
+        
+        if let bitcoinResult = json["ask"].double {
+            bitcoinPriceLabel.text = String(bitcoinResult)
+        }else {
+            bitcoinPriceLabel.text = "Price Unavialble"
+            
+        }
+        
+        
+    }
 
 //    func updateWeatherData(json : JSON) {
 //        
